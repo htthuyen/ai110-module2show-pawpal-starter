@@ -22,6 +22,18 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Features (current implementation)
+
+- **Due-task detection**: tasks are “due” based on `frequency`, `is_completed`, `last_completed`, and optional `due_on`.
+- **Status filtering**: filter tasks by `all` / `due` / `completed` / `incomplete` for a given day.
+- **Priority-based planning (time budget)**: selects due tasks greedily by priority (high→low), then shorter duration, within `time_available_minutes`.
+- **Timed daily schedule**:
+	- Places fixed-time tasks first (`fixed_time=True` + `preferred_start_time`).
+	- Fills remaining time gaps with flexible tasks greedily by priority.
+	- Outputs a schedule sorted chronologically by start time.
+- **Conflict warnings**: detects overlapping scheduled entries and returns `ScheduleConflict` warnings instead of crashing.
+- **Daily/weekly recurrence spawning**: marking a daily/weekly task complete spawns the next occurrence as a new `Task` with `due_on = completed_on + (1 or 7 days)`.
+
 ## Getting started
 
 ### Setup
@@ -41,3 +53,10 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+
+## Demo
+
+
+<a href="/app_screenshot1.png" target="_blank"><img src='/app_screenshot1.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
+<a href="/app_screenshot2.png" target="_blank"><img src='/app_screenshot2.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
