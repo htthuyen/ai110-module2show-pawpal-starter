@@ -1,5 +1,5 @@
 
-from datetime import date
+from datetime import date, time
 
 from pawpal_system import Owner, Pet, Scheduler, Task
 
@@ -20,11 +20,47 @@ def main() -> None:
 	luna.add_task(Task(description="Clean litter box", duration_minutes=8, frequency="daily", priority="high"))
 	luna.add_task(Task(description="Playtime (wand toy)", duration_minutes=12, frequency="daily", priority="medium"))
 
+	# Conflict demo: two fixed-time tasks that overlap.
+	mochi.add_task(
+		Task(
+			description="Vet call",
+			duration_minutes=30,
+			frequency="once",
+			priority="high",
+			preferred_start_time=time(9, 0),
+			fixed_time=True,
+		)
+	)
+	mochi.add_task(
+		Task(
+			description="Training session",
+			duration_minutes=30,
+			frequency="once",
+			priority="high",
+			preferred_start_time=time(9, 0),
+			fixed_time=True,
+		)
+	)
+
 	# Generate and print today's schedule
 	today = date.today()
 	scheduler = Scheduler(owner)
 	time_budget = 45
 	plan = scheduler.generate_plan(time_available_minutes=time_budget, on=today)
+
+	# Generate and print a timed schedule (with conflict warnings)
+	timed_entries, conflicts = scheduler.generate_timed_plan(
+		time_available_minutes=180,
+		on=today,
+		day_start=time(8, 0),
+	)
+	if conflicts:
+		print("WARNING: Schedule conflicts detected:")
+		for c in conflicts:
+			print(
+				f"- {c.first.task.description} ({c.first.start.time()}-{c.first.end.time()}) overlaps "
+				f"{c.second.task.description} ({c.second.start.time()}-{c.second.end.time()})"
+			)
 
 	print(f"Today's Schedule ({today.isoformat()})")
 	print("=" * 32)
